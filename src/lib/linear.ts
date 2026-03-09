@@ -146,11 +146,73 @@ export async function getIssueComments(
   return results;
 }
 
+export interface ProjectSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  url: string;
+}
+
+export interface ProjectDetail extends ProjectSummary {
+  tickets: TicketSummary[];
+}
+
 export async function getIssueProject(
   identifier: string,
 ): Promise<{ name: string; description: string | null } | null> {
   const detail = await getIssue(identifier);
   return detail.project;
+}
+
+export async function listProjects(): Promise<ProjectSummary[]> {
+  const client = await getClient();
+  const projects = await client.projects({ first: 50 });
+
+  return projects.nodes.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description ?? null,
+    status: p.state,
+    url: p.url,
+  }));
+}
+
+export async function getProjectDetail(nameOrId: string): Promise<ProjectDetail> {
+  const client = await getClient();
+
+  // Try to find by name first (case-insensitive)
+  const projects = await client.projects({ first: 100 });
+  let project = projects.nodes.find(
+    (p) => p.name.toLowerCase() === nameOrId.toLowerCase() || p.id === nameOrId,
+  );
+
+  if (!project) {
+    throw new LynError(`Project "${nameOrId}" not found.`);
+  }
+
+  const issues = await project.issues({ first: 100 });
+  const tickets: TicketSummary[] = [];
+  for (const issue of issues.nodes) {
+    const state = await issue.state;
+    tickets.push({
+      id: issue.id,
+      identifier: issue.identifier,
+      title: issue.title,
+      status: state?.name ?? 'Unknown',
+      priority: issue.priority,
+      priorityLabel: issue.priorityLabel,
+    });
+  }
+
+  return {
+    id: project.id,
+    name: project.name,
+    description: project.description ?? null,
+    status: project.state,
+    url: project.url,
+    tickets,
+  };
 }
 
 export async function searchIssues(query: string): Promise<TicketSummary[]> {

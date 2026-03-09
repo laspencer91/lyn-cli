@@ -11,6 +11,7 @@ import { registerCreate } from './commands/create.js';
 import { registerLink } from './commands/link.js';
 import { registerPlan } from './commands/plan.js';
 import { registerDelete } from './commands/delete.js';
+import { registerProjects } from './commands/projects.js';
 
 program
   .name('lyn')
@@ -29,5 +30,6 @@ registerCreate(program);
 registerLink(program);
 registerPlan(program);
 registerDelete(program);
+registerProjects(program);
 
 program.parse();

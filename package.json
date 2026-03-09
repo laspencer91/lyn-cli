@@ -1,16 +1,39 @@
 {
-  "name": "lyn-cli",
-  "version": "0.1.0",
-  "description": "Bridge Linear tickets to local git workflows and Claude Code",
+  "name": "lyn-linear",
+  "version": "0.1.1",
+  "description": "CLI that bridges Linear with git workflows and Claude Code — automate tickets, branches, PRs, and give your AI agent project management context",
   "type": "module",
   "bin": {
-    "lyn": "./dist/index.js"
+    "lyn": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.ts",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "linear",
+    "cli",
+    "git",
+    "claude",
+    "claude-code",
+    "ai",
+    "project-management",
+    "workflow",
+    "developer-tools"
+  ],
+  "author": "laspencer91",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laspencer91/lyn-cli.git"
+  },
+  "homepage": "https://github.com/laspencer91/lyn-cli#readme",
   "engines": {
     "node": ">=20"
   },
