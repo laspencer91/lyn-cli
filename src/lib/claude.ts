@@ -100,6 +100,7 @@ function buildPlanPrompt(ticket: TicketDetail): string {
   parts.push('- `lyn create -t "Title" -d "Description" -p 2` — Create a standalone ticket (priority: 1=urgent, 2=high, 3=medium, 4=low)');
   parts.push(`- \`lyn link ${ticket.identifier} OTHER-123 --type related\` — Link tickets (types: related, blocks, duplicate, similar)`);
   parts.push('- `lyn search "query"` — Search Linear issues for related or duplicate tickets');
+  parts.push(`- \`lyn delete ${ticket.identifier}\` — Permanently delete a ticket (no confirmation needed when run as agent)`);
   parts.push(`- \`lyn comments ${ticket.identifier} --max=5\` — Get recent comments on this ticket`);
   parts.push(`- \`lyn project ${ticket.identifier} -d\` — Get project description for context`);
   parts.push(`- \`lyn status ${ticket.identifier}\` — Check current ticket status`);
@@ -154,6 +155,7 @@ function buildOpenPlanPrompt(): string {
   parts.push('- `lyn create -t "Title" -d "Description" --parent INT-123 --assign` — Create a sub-task under a parent ticket');
   parts.push('- `lyn link INT-123 INT-456 --type related` — Link tickets (types: related, blocks, duplicate, similar)');
   parts.push('- `lyn search "query"` — Search Linear issues to find related or duplicate tickets');
+  parts.push('- `lyn delete INT-123` — Permanently delete a ticket (no confirmation needed when run as agent)');
   parts.push('- `lyn mine` — List currently assigned tickets');
   parts.push('- `lyn status INT-123` — Get full details on a ticket');
   parts.push('- `lyn comments INT-123 --max=5` — Get comments on a ticket');

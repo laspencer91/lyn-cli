@@ -222,6 +222,11 @@ export async function linkIssues(
   });
 }
 
+export async function deleteIssue(issueId: string): Promise<void> {
+  const client = await getClient();
+  await client.deleteIssue(issueId);
+}
+
 export async function validateApiKey(apiKey: string) {
   const client = new LinearClient({ apiKey });
   try {
