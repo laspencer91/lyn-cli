@@ -21,22 +21,37 @@ export async function getMe() {
 }
 
 export async function getMyIssues(teamId?: string): Promise<TicketSummary[]> {
+  return getIssues({ assignee: 'me', teamId });
+}
+
+export async function getIssues(opts: {
+  assignee?: 'me' | 'unassigned' | 'anyone';
+  teamId?: string;
+  includeCompleted?: boolean;
+  limit?: number;
+} = {}): Promise<TicketSummary[]> {
   const client = await getClient();
-  const me = await client.viewer;
+  const filter: Record<string, any> = {};
 
-  const filter: Record<string, any> = {
-    assignee: { id: { eq: me.id } },
-    state: { type: { nin: ['completed', 'canceled'] } },
-  };
+  if (opts.assignee === 'me') {
+    const me = await client.viewer;
+    filter.assignee = { id: { eq: me.id } };
+  } else if (opts.assignee === 'unassigned') {
+    filter.assignee = { null: true };
+  }
+  // 'anyone' or undefined = no assignee filter
 
-  if (teamId) {
-    filter.team = { id: { eq: teamId } };
+  if (!opts.includeCompleted) {
+    filter.state = { type: { nin: ['completed', 'canceled'] } };
+  }
+
+  if (opts.teamId) {
+    filter.team = { id: { eq: opts.teamId } };
   }
 
   const issues = await client.issues({
     filter,
-    orderBy: client.constructor ? undefined : undefined,
-    first: 50,
+    first: opts.limit ?? 50,
   });
 
   const results: TicketSummary[] = [];
