@@ -41,8 +41,9 @@ export async function pullLatest(branch: string): Promise<void> {
   await git.pull('origin', branch);
 }
 
-export async function createAndPush(branchName: string): Promise<void> {
+export async function createAndPush(branchName: string, ticketIdentifier: string): Promise<void> {
   await git.checkoutLocalBranch(branchName);
+  await git.commit(`${ticketIdentifier}: initial branch`, [], { '--allow-empty': null });
   await git.push(['-u', 'origin', branchName]);
 }
 

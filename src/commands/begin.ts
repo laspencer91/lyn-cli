@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import slugifyPkg from 'slugify';
 const slugify = (slugifyPkg as any).default ?? slugifyPkg;
 import { ensureConfig } from '../lib/config.js';
-import { getMyIssues, getIssue, moveIssue } from '../lib/linear.js';
+import { getMyIssues, getIssue, moveIssue, addComment } from '../lib/linear.js';
 import {
   ensureGitRepo,
   ensureClean,
@@ -70,7 +70,7 @@ export function registerBegin(program: Command) {
         }
 
         console.log(chalk.dim(`  Creating branch ${branchName}...`));
-        await createAndPush(branchName);
+        await createAndPush(branchName, ticket.identifier);
 
         // Step 6: Move ticket to In Progress
         console.log(chalk.dim('  Moving ticket to In Progress...'));
@@ -78,8 +78,9 @@ export function registerBegin(program: Command) {
 
         // Step 7: Create draft PR
         console.log(chalk.dim('  Creating draft PR...'));
+        let prUrl: string | null = null;
         try {
-          const prUrl = await createDraftPR(
+          prUrl = await createDraftPR(
             `${ticket.identifier}: ${ticket.title}`,
             `Resolves ${ticket.identifier}\n\n${ticket.url}`,
             defaultBranch,
@@ -93,7 +94,12 @@ export function registerBegin(program: Command) {
           );
         }
 
-        // Step 8: Summary
+        // Step 8: Post comment on Linear ticket
+        const commentLines = [`Started work on branch \`${branchName}\``];
+        if (prUrl) commentLines.push(`PR: ${prUrl}`);
+        await addComment(ticket.id, commentLines.join('\n'));
+
+        // Step 9: Summary
         console.log(chalk.green('\n  Ready to work!\n'));
         console.log(`  ${chalk.bold(ticket.identifier)} ${ticket.title}`);
         console.log(`  ${chalk.dim('Branch:')} ${branchName}`);
